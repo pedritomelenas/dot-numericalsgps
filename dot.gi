@@ -14,165 +14,240 @@
 
 ############################################################################
 ##
-#F RelToDotNS(uni, rel, labels)
-##  rel is a list of lists with two elements representing
-##  a binary relation on the set uni. labels are the labels of the nodes
-##  Displays a (di)graph in dot whose vertices are uni
-##  and edges these relations.
+#F DotSplash(dots...)
+##  Launches a browser and visualizes the dots diagrams 
+##  provided as arguments.
 ##
 ############################################################################
-InstallGlobalFunction(RelToDotNS,function(uni, rel,labels)
-
-  local r, output, out, i, str;
+InstallGlobalFunction(DotSplash, function(dots...)
+  local str, temp_file, digraph, html, i, line;
 
   str:=function(s)
     return Concatenation("\"",String(s),"\"");
   end;
-
-
-  if not IsList(uni) then
-    Error("The first argument must be a list");
-  fi;
-  if rel<>[] and not (IsRectangularTable(rel) and ForAll(rel, p->Length(p)=2)) then
-    Error("The second argument must be a list of pairs (lists with two elements)");
-  fi;
-  if not IsSubset(uni,Union(rel)) then
-    Error("The relations must be relaions on the elmenents in the first argument");
-  fi;
-  if not IsList(labels) then
-    Error("The third argument must be a list");
-  fi;
-  if Length(uni)<>Length(labels) then
-    Error("The first and third arguments must have the same length");
-  fi;
-
-
-  out:="";
-  output:=OutputTextString(out,true);
-  AppendTo(output,"digraph  NSGraph{");
-  for i in [1..Length(uni)] do
-    AppendTo(output,i," [label=",str(labels[i]),"];");
-  od;
-  for r in rel do
-      AppendTo(output,Position(uni,r[1])," -> ",Position(uni,r[2]),";");
-  od;
-  AppendTo(output,"}");
-  CloseStream(output);
-  return out;
-end);
-
-############################################################################
-##
-#F AperyListInDot(arg)
-##  arg is either a semigroup S, or a semigroup S and an integer n.
-##  If no second argument is given, then n is taken to be the
-##  multiplicity of S.
-##  Displays in dot the Hasse diagram of Ap(S,n) with respect to the
-##  ordering a <= b if b-a in S
-##
-############################################################################
-InstallGlobalFunction(AperyListInDot,function(arg)
-  local ap,c,hasse, s, n, r, output, out;
-  # rel is a list of lists with two elements representin a binary relation
-  # hasse(rel) removes from rel the pairs [x,y] such that there exists
-  # z with [x,z],[z,y] in rel
-  hasse:=function(rel)
-      local dom, out;
-      dom:=Flat(rel);
-
-      out:=Filtered(rel, p-> ForAny(dom, x->([p[1],x] in rel) and ([x,p[2]] in rel)));
-      return Difference(rel,out);
-
-  end;
-
-
-  if Length(arg)=1 then
-    s:=arg[1];
-    n:=MultiplicityOfNumericalSemigroup(s);
-  fi;
-  if Length(arg)=2 then
-    s:=arg[1];
-    n:=arg[2];
-  fi;
-  if Length(arg)>2 then
-    Error("The number of arguments must be one or two");
-  fi;
-  ap:=AperyList(s,n);
-  c:=Cartesian(ap,ap);
-  c:=Filtered(c, p-> p[2]<>p[1]);
-  c:=Filtered(c, p-> p[1]-p[2] in s);
-	c:=hasse(c);
-  out:="";
-  output:=OutputTextString(out,true);
-
-  AppendTo(output,"graph  AperyHasse{");
-
-  for r in c do
-      AppendTo(output,r[1]," -- ",r[2],";");
-  od;
-
-  AppendTo(output,"}");
-
-  CloseStream(output);
-  return out;
-
-end);
-
-##########################################################
-#
-# Launches browser and visualizes dots contained in the list ts
-#
-##########################################################
-
-InstallGlobalFunction(HtmlDotSplashNS,
-function(ts)
-  local digraph, n, e, str, name, html, t,i, line;
-
-  str:=function(s)
-    return Concatenation("\"",String(s),"\"");
-  end;
-
-  name := Filename(DirectoryTemporary(), "graph-test.html");
-
-  html:="<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n <title>Apéry NS</title>\n";
-  html:=Concatenation(html, "<style>\n .content {\n display: inline-block;\n text-align: center;\n vertical-align: top;\n}\n</style></head>\n<body>\n<script  src=\"http://mdaines.github.io/viz.js/bower_components/viz.js/viz.js\">\n</script>\n");
+  
+  # Open a temporal file
+  temp_file := Filename(DirectoryTemporary(), "graph-viz.html");
+  
+  # HTML header
+  html := "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n <title>Graph Viz</title>\n";
+  html := Concatenation(html, "<style>\n .content {\n display: inline-block;\n text-align: center;\n vertical-align: top;\n}\n</style></head>\n<body>\n<script  src=\"http://mdaines.github.io/viz.js/bower_components/viz.js/viz.js\">\n</script>\n");
   #html:=Concatenation(html, "<style>\n .content {\n display: inline-block;\n text-align: center;\n vertical-align: top;\n}\n</style></head>\n<body>\n<script  src=\"viz.js\">\n</script>\n");
-
-  AppendTo(name,html);
-
-  for i in [1..Length(ts)] do
-    line:=Concatenation("<span id=", str(i)," class='content'>Graph to be displayed here (internet connection required) </span>\n");
-    AppendTo(name,line);
-    html:=Concatenation(html,line);
+  
+  # Assign an ID to each graph
+  for i in [1..Length(dots)] do
+    line := Concatenation("<span id=", str(i), " class='content'>Graph to be displayed here (internet connection required) </span>\n");
+    html := Concatenation(html, line);
   od;
-  line:="<script>\n";
-  AppendTo(name,line);
-  html:=Concatenation(html,line);
-  i:=1;
-  for t in ts do
-    digraph:=t;
-    line:=Concatenation(" document.getElementById(",str(i),").innerHTML =Viz('",digraph,"');\n");
-    AppendTo(name,line);
-    html:=Concatenation(html,line);
-    i:=i+1;
+  
+  # Draw each graph
+  line := "<script>\n";
+  html := Concatenation(html, line);
+  i := 1;
+  for digraph in dots do
+    line := Concatenation(" document.getElementById(", str(i), ").innerHTML =Viz('", digraph, "');\n");
+    html := Concatenation(html, line);
+    i := i+1;
   od;
-
-  line:="</script>\n</body>\n</html>";
-  AppendTo(name,line);
-  html:=Concatenation(html, line);
-
-  #name := Filename(DirectoryTemporary(), "graph-test.html");
-  Print("Saved to ",name,"\n");
+  
+  # End the HTML code
+  line := "</script>\n</body>\n</html>";
+  html := Concatenation(html, line);
+  
+  # Draw the graph
+  AppendTo(temp_file, html);  
+  Print("Saved to ", temp_file, "\n");
   if ARCH_IS_MAC_OS_X() then
-    Exec("open ",name);
+    Exec("open ", temp_file);
   fi;
   if ARCH_IS_WINDOWS() then
-    Exec("start firefox ",name);
+    Exec("start firefox ", temp_file);
   fi;
   if ARCH_IS_UNIX() then
-    Exec("xdg-open ",name);
+    Exec("xdg-open ", temp_file);
   fi;
 
   return html;
+end);
 
+############################################################################
+##
+#F BinaryRelationToDot(br)
+##  Returns a GraphViz dot which represents the binary relation br.
+##  The set of vertices of the resulting graph is the source of br.
+##  Edges join those elements which are related in br.
+##
+############################################################################
+InstallGlobalFunction(BinaryRelationToDot, function(br)
+  local pre, element, im, output, out, str;
+
+  str := function(i)
+    return Concatenation("\"",String(i),"\"");
+  end;
+
+  if not IsBinaryRelation(br) then
+    Error("The argument must be a binary relation");
+  fi;
+  
+  # Add the header of the GraphViz code
+  out := "";
+  output := OutputTextString(out, true);
+  AppendTo(output,"digraph  NSGraph{rankdir = TB; edge[dir=back];");
+  
+  # Add the vertices
+  pre := Source(br);
+  for element in pre do
+    AppendTo(output, element," [label=", str(element), "];");
+  od;
+  
+  # Add the edges
+  for element in pre do
+    for im in Image(br, [element]) do
+      AppendTo(output, im, " -> ", element, ";");
+    od;
+  od;
+  
+  AppendTo(output, "}");
+  CloseStream(output);
+  return out;
+end);
+
+############################################################################
+##
+#F HasseDiagramOfNumericalSemigroup(s, A)
+##  Returns a binary relation which is the Hasse diagram of A with 
+##  respect to the ordering a <= b if b - a in S.
+##
+############################################################################
+InstallGlobalFunction(HasseDiagramOfNumericalSemigroup, function(s, A)
+  local rel, p;
+  
+  if not IsNumericalSemigroup(s) then
+    Error("The argument must be a numerical semigroup.\n");
+  fi;
+  
+  # Build the binary relation and returns its Hasse diagram
+  A := Domain(Set(A));
+  rel := Tuples(A, 2);
+  rel := Filtered(rel, p -> p[2] - p[1] in s);
+  rel := List(rel, p -> Tuple([p[1], p[2]]));  
+  rel := BinaryRelationByElements(A, rel);  
+  return HasseDiagramBinaryRelation(rel);  
+end);
+
+############################################################################
+##
+#F HasseDiagramOfBettiElementsOfNumericalSemigroup(s)
+##  Returns a binary relation which is the Hasse diagram of the Betti
+##  elements of s with respect to the ordering a <= b if b - a in S.
+##
+############################################################################
+InstallGlobalFunction(HasseDiagramOfBettiElementsOfNumericalSemigroup, function(s)
+  if not IsNumericalSemigroup(s) then
+    Error("The argument must be a numerical semigroup.\n");
+  fi;
+    
+  return HasseDiagramOfNumericalSemigroup(s, BettiElementsOfNumericalSemigroup(s));    
+end);
+
+############################################################################
+##
+#F HasseDiagramOfAperyListOfNumericalSemigroup(s, n)
+##
+############################################################################
+InstallGlobalFunction(HasseDiagramOfAperyListOfNumericalSemigroup, function(s, n...)
+  local a;
+    
+  if not IsNumericalSemigroup(s) then
+    Error("The argument must be a numerical semigroup.\n");
+  fi;
+  
+  if Length(n) = 0 then
+    a := MultiplicityOfNumericalSemigroup(s);
+  elif Length(n) = 1 then
+    a := n[1];
+  else
+    Error("The number of arguments must be one or two");
+  fi;
+    
+  return HasseDiagramOfNumericalSemigroup(s, AperyListOfNumericalSemigroup(s, a));    
+end);
+
+############################################################################
+##
+#F DotTreeOfGluingsOfNumericalSemigroup(s, depth)
+##  Returns a GraphViz dot which represents the tree of gluings of the
+##  numerical semigroup s.
+##  The tree is truncated at the given depth.
+##
+############################################################################
+InstallGlobalFunction(DotTreeOfGluingsOfNumericalSemigroup, function(s, depth)
+  local SystemOfGeneratorsToString, rgluings, out, output, labels, edges, index;
+
+  SystemOfGeneratorsToString := function(sg)
+    return Concatenation("〈 ", JoinStringsWithSeparator(sg, ", "), " 〉");
+  end;
+    
+  if not IsNumericalSemigroup(s) then
+    Error("The argument must be a numerical semigroup.\n");
+  fi;
+
+  # Recursively plot the gluings tree 
+  rgluings := function(s, level, parent)
+    local lg, label, gen1, gen2, p, son1, son2;
+      
+    lg := AsGluingOfNumericalSemigroups(s);    
+    
+    labels := Concatenation(labels, String(parent), " [label=\"", SystemOfGeneratorsToString(MinimalGenerators(s)), "\", style=filled]; ");
+    #labels := Concatenation(labels, String(parent), " [label=\"", SystemOfGeneratorsToString(MinimalGenerators(s)), "\"]; ");
+        
+    if level = 0 then
+      return ;
+    fi;
+    
+    # For each possible gluing plot the gluing and the numerical semigroups associated.
+    for p in lg do
+      # Add the gluing 
+      label := Concatenation(SystemOfGeneratorsToString(p[1])," + ", SystemOfGeneratorsToString(p[2]));
+      labels := Concatenation(labels, String(index), " [label=\"", label, "\" , shape=box]; ");
+      edges := Concatenation(edges, String(parent), " -> ", String(index), "; ");
+      
+      # Add the two numerical semigroups involved
+      son1 := index+1;
+      son2 := index+2;
+      
+      gen1 := p[1] / Gcd(p[1]);
+      gen2 := p[2] / Gcd(p[2]);      
+      
+      edges := Concatenation(edges, String(index), " -> ", String(son1), "; ");
+      edges := Concatenation(edges, String(index), " -> ", String(son2), "; ");
+      
+      # Call the function recursively
+      index := index + 3;      
+      rgluings(NumericalSemigroup(gen1), level-1, son1);      
+      rgluings(NumericalSemigroup(gen2), level-1, son2);      
+    od;
+    
+    return ;
+  end;
+  
+  # Create the root of the tree
+  labels := "";
+  edges := "";  
+  index := 1;
+  labels := Concatenation(labels, "0", " [label=\"", SystemOfGeneratorsToString(MinimalGenerators(s)), "\"]; ");  
+  # Compute the tree
+  rgluings(s, depth, 0);
+  
+  # Prepare the output
+  out := "";
+  output := OutputTextString(out, true);
+  SetPrintFormattingStatus(output, false);
+  AppendTo(output,"digraph  NSGraph{rankdir = TB; ");
+  AppendTo(output, labels);
+  AppendTo(output, edges);
+  AppendTo(output, "}");
+  CloseStream(output);
+  
+  return out;
 end);
