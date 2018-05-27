@@ -120,18 +120,18 @@ end);
 ##
 ############################################################################
 InstallGlobalFunction(HasseDiagramOfNumericalSemigroup, function(s, A)
-  local rel, p;
+  local rel, p, D;
   
   if not IsNumericalSemigroup(s) then
     Error("The argument must be a numerical semigroup.\n");
   fi;
   
   # Build the binary relation and returns its Hasse diagram
-  A := Domain(Set(A));
-  rel := Tuples(A, 2);
+  D := Domain(Set(A));
+  rel := Tuples(D, 2);
   rel := Filtered(rel, p -> p[2] - p[1] in s);
   rel := List(rel, p -> Tuple([p[1], p[2]]));  
-  rel := BinaryRelationByElements(A, rel);  
+  rel := BinaryRelationByElements(D, rel);  
   return HasseDiagramBinaryRelation(rel);  
 end);
 
