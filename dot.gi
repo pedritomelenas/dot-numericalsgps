@@ -262,51 +262,52 @@ end);
 ##
 ############################################################################
 InstallGlobalFunction(OverSemigroupsNumericalSemigroupInDot, function(s)
-    local ov, c,i,r,n,hasse, str, output, out, SystemOfGeneratorsToString;
-    
-    hasse:=function(rel)
-      local dom, out;
-      dom:=Flat(rel);
-      out:=Filtered(rel, p-> ForAny(dom, x->([p[1],x] in rel) and ([x,p[2]] in rel)));
-      return Difference(rel,out);
-    end;
+  local ov, c,i,r,n,hasse, str, output, out, SystemOfGeneratorsToString;
+  
+  hasse:=function(rel)
+    local dom, out;
+    dom:=Flat(rel);
+    out:=Filtered(rel, p-> ForAny(dom, x->([p[1],x] in rel) and ([x,p[2]] in rel)));
+    return Difference(rel,out);
+  end;
 
-    str := function(i)
-        return Concatenation("\"",String(i),"\"");
-    end;
+  str := function(i)
+    return Concatenation("\"",String(i),"\"");
+  end;
 
-    SystemOfGeneratorsToString := function(sg)
-        return Concatenation("〈 ", JoinStringsWithSeparator(sg, ", "), " 〉");
-    end;
+  SystemOfGeneratorsToString := function(sg)
+    return Concatenation("〈 ", JoinStringsWithSeparator(sg, ", "), " 〉");
+  end;
 
-    ov:=OverSemigroupsNumericalSemigroup(s);
-    n:=Length(ov);
+  ov:=OverSemigroupsNumericalSemigroup(s);
+  n:=Length(ov);
 
-    # Add the header of the GraphViz code
-    out := "";
-    output := OutputTextString(out, true);
-    AppendTo(output,"digraph  NSGraph{rankdir = TB; edge[dir=back];");
+  # Add the header of the GraphViz code
+  out := "";
+  output := OutputTextString(out, true);
+  SetPrintFormattingStatus(output, false);
+  AppendTo(output,"digraph  NSGraph{rankdir = TB; edge[dir=back];");
 
-    # Add vertices
-    for i in [1..n] do
-        if IsIrreducible(ov[i]) then 
-            AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\", style=filled];");
-        else 
-            AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\"];");
-        fi;
-    od;
+  # Add vertices
+  for i in [1..n] do
+   if IsIrreducible(ov[i]) then 
+    AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\", style=filled];");
+   else 
+    AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\"];");
+   fi;
+  od;
 
-    # Add edges
-    c:=Cartesian([1..n],[1..n]);
-    c:=Filtered(c, p-> p[2]<>p[1]);
-    c:=Filtered(c, p-> IsSubset(ov[p[1]],ov[p[2]]));
-    c:=hasse(c);
+  # Add edges
+  c:=Cartesian([1..n],[1..n]);
+  c:=Filtered(c, p-> p[2]<>p[1]);
+  c:=Filtered(c, p-> IsSubset(ov[p[1]],ov[p[2]]));
+  c:=hasse(c);
 
-    for r in c do
-        AppendTo(output,r[1]," -> ",r[2],";");
-    od;
+  for r in c do
+    AppendTo(output,r[1]," -> ",r[2],";");
+  od;
 
-    AppendTo(output, "}");
-    CloseStream(output);
-    return out;    
+  AppendTo(output, "}");
+  CloseStream(output);
+  return out;  
 end);
