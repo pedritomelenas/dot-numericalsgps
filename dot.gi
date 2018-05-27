@@ -21,7 +21,7 @@
 ##
 ############################################################################
 InstallGlobalFunction(DotSplash, function(dots...)
-  local str, temp_file, digraph, html, i, line;
+  local str, temp_file, digraph, html, i, line, out;
 
   str:=function(s)
     return Concatenation("\"",String(s),"\"");
@@ -29,7 +29,11 @@ InstallGlobalFunction(DotSplash, function(dots...)
   
   # Open a temporal file
   temp_file := Filename(DirectoryTemporary(), "graph-viz.html");
-  SetPrintFormattingStatus(temp_file, false);
+<<<<<<< HEAD
+  out := OutputTextFile(temp_file, false);
+  SetPrintFormattingStatus(out, false);  
+=======
+>>>>>>> origin/master
   
   # HTML header
   html := "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n <title>Graph Viz</title>\n";
@@ -57,7 +61,8 @@ InstallGlobalFunction(DotSplash, function(dots...)
   html := Concatenation(html, line);
   
   # Draw the graph
-  AppendTo(temp_file, html);  
+  PrintTo(out, html);  
+  CloseStream(out);
   Print("Saved to ", temp_file, "\n");
   if ARCH_IS_MAC_OS_X() then
     Exec("open ", temp_file);
@@ -175,14 +180,15 @@ end);
 
 ############################################################################
 ##
-#F DotTreeOfGluingsOfNumericalSemigroup(s, depth)
+#F DotTreeOfGluingsOfNumericalSemigroup(s, depth...)
 ##  Returns a GraphViz dot that represents the tree of gluings of the
 ##  numerical semigroup s.
-##  The tree is truncated at the given depth.
+##  The tree is truncated at the given depth. If the depth is not provided,
+##  then the tree is fully built.
 ##
 ############################################################################
-InstallGlobalFunction(DotTreeOfGluingsOfNumericalSemigroup, function(s, depth)
-  local SystemOfGeneratorsToString, rgluings, out, output, labels, edges, index;
+InstallGlobalFunction(DotTreeOfGluingsOfNumericalSemigroup, function(s, depth...)
+  local SystemOfGeneratorsToString, rgluings, out, output, labels, edges, index, d;
 
   SystemOfGeneratorsToString := function(sg)
     return Concatenation("〈 ", JoinStringsWithSeparator(sg, ", "), " 〉");
@@ -190,6 +196,12 @@ InstallGlobalFunction(DotTreeOfGluingsOfNumericalSemigroup, function(s, depth)
     
   if not IsNumericalSemigroup(s) then
     Error("The argument must be a numerical semigroup.\n");
+  fi;
+  
+  if Length(depth) = 0 then
+    d := -1;
+  else
+    d:= depth[1];      
   fi;
 
   # Recursively plot the gluings tree 
@@ -237,7 +249,7 @@ InstallGlobalFunction(DotTreeOfGluingsOfNumericalSemigroup, function(s, depth)
   index := 1;
   labels := Concatenation(labels, "0", " [label=\"", SystemOfGeneratorsToString(MinimalGenerators(s)), "\"]; ");  
   # Compute the tree
-  rgluings(s, depth, 0);
+  rgluings(s, d, 0);
   
   # Prepare the output
   out := "";
