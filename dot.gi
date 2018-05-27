@@ -28,6 +28,7 @@ InstallGlobalFunction(DotSplash, function(dots...)
   
   # Open a temporal file
   temp_file := Filename(DirectoryTemporary(), "graph-viz.html");
+  SetPrintFormattingStatus(temp_file, false);
   
   # HTML header
   html := "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n <title>Graph Viz</title>\n";
