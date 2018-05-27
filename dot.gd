@@ -2,8 +2,8 @@
 ##
 #W  dot.gd                  Manuel Delgado <mdelgado@fc.up.pt>
 #W                          Pedro A. Garcia-Sanchez <pedro@ugr.es>
+#W                          Andrés Herrera-Poyatos <andreshp9@gmail.com>
 ##
-## Andrés Herrera-Pollatos collaborated on the development of this file.
 ##
 #H  @(#)$Id: dot.gd $
 ##
@@ -64,9 +64,19 @@ DeclareGlobalFunction("HasseDiagramOfAperyListOfNumericalSemigroup");
 ############################################################################
 ##
 #F DotTreeOfGluingsOfNumericalSemigroup(s, depth)
-##  Returns a GraphViz dot which represents the tree of gluings of the
+##  Returns a GraphViz dot that represents the tree of gluings of the
 ##  numerical semigroup s.
 ##  The tree is truncated at the given depth.
 ##
 ############################################################################
 DeclareGlobalFunction("DotTreeOfGluingsOfNumericalSemigroup");
+
+############################################################################
+##
+#F OverSemigroupsNumericalSemigroupInDot(s)
+##  Returns a GraphViz dot that represents the Hasse diagram of 
+##  oversemigroupstree of the numerical semigroup s.
+##  Irreducible numerical semigroups are highlighted.
+##
+############################################################################
+DeclareGlobalFunction("OverSemigroupsNumericalSemigroupInDot");
