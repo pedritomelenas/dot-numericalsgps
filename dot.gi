@@ -2,6 +2,7 @@
 ##
 #W  dot.gi                  Manuel Delgado <mdelgado@fc.up.pt>
 #W                          Pedro A. Garcia-Sanchez <pedro@ugr.es>
+#W                          Andrés Herrera-Poyatos <andreshp9@gmail.com>
 ##
 ##
 #H  @(#)$Id: dot.gi $
@@ -60,11 +61,9 @@ InstallGlobalFunction(DotSplash, function(dots...)
   Print("Saved to ", temp_file, "\n");
   if ARCH_IS_MAC_OS_X() then
     Exec("open ", temp_file);
-  fi;
-  if ARCH_IS_WINDOWS() then
+  elif ARCH_IS_WINDOWS() then
     Exec("start firefox ", temp_file);
-  fi;
-  if ARCH_IS_UNIX() then
+  elif ARCH_IS_UNIX() then
     Exec("xdg-open ", temp_file);
   fi;
 
@@ -177,7 +176,7 @@ end);
 ############################################################################
 ##
 #F DotTreeOfGluingsOfNumericalSemigroup(s, depth)
-##  Returns a GraphViz dot which represents the tree of gluings of the
+##  Returns a GraphViz dot that represents the tree of gluings of the
 ##  numerical semigroup s.
 ##  The tree is truncated at the given depth.
 ##
@@ -251,4 +250,63 @@ InstallGlobalFunction(DotTreeOfGluingsOfNumericalSemigroup, function(s, depth)
   CloseStream(output);
   
   return out;
+end);
+
+
+############################################################################
+##
+#F OverSemigroupsNumericalSemigroupInDot(s)
+##  Returns a GraphViz dot that represents the Hasse diagram of 
+##  oversemigroupstree of the numerical semigroup s.
+##  Irreducible numerical semigroups are highlighted.
+##
+############################################################################
+InstallGlobalFunction(OverSemigroupsNumericalSemigroupInDot, function(s)
+    local ov, c,i,r,n,hasse, str, output, out, SystemOfGeneratorsToString;
+    
+    hasse:=function(rel)
+      local dom, out;
+      dom:=Flat(rel);
+      out:=Filtered(rel, p-> ForAny(dom, x->([p[1],x] in rel) and ([x,p[2]] in rel)));
+      return Difference(rel,out);
+    end;
+
+    str := function(i)
+        return Concatenation("\"",String(i),"\"");
+    end;
+
+    SystemOfGeneratorsToString := function(sg)
+        return Concatenation("〈 ", JoinStringsWithSeparator(sg, ", "), " 〉");
+    end;
+
+    ov:=OverSemigroupsNumericalSemigroup(s);
+    n:=Length(ov);
+
+    # Add the header of the GraphViz code
+    out := "";
+    output := OutputTextString(out, true);
+    AppendTo(output,"digraph  NSGraph{rankdir = TB; edge[dir=back];");
+
+    # Add vertices
+    for i in [1..n] do
+        if IsIrreducible(ov[i]) then 
+            AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\", style=filled];");
+        else 
+            AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\"];");
+        fi;
+    od;
+
+    # Add edges
+    c:=Cartesian([1..n],[1..n]);
+    c:=Filtered(c, p-> p[2]<>p[1]);
+    c:=Filtered(c, p-> IsSubset(ov[p[1]],ov[p[2]]));
+    c:=hasse(c);
+
+    for r in c do
+        AppendTo(output,r[1]," -> ",r[2],";");
+    od;
+
+    AppendTo(output, "}");
+    CloseStream(output);
+    return out;    
 end);
