@@ -63,10 +63,11 @@ DeclareGlobalFunction("HasseDiagramOfAperyListOfNumericalSemigroup");
 
 ############################################################################
 ##
-#F DotTreeOfGluingsOfNumericalSemigroup(s, depth)
+#F DotTreeOfGluingsOfNumericalSemigroup(s, depth...)
 ##  Returns a GraphViz dot that represents the tree of gluings of the
 ##  numerical semigroup s.
-##  The tree is truncated at the given depth.
+##  The tree is truncated at the given depth. If the depth is not provided,
+##  then the tree is fully built.
 ##
 ############################################################################
 DeclareGlobalFunction("DotTreeOfGluingsOfNumericalSemigroup");
