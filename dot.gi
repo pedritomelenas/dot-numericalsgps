@@ -60,11 +60,9 @@ InstallGlobalFunction(DotSplash, function(dots...)
   Print("Saved to ", temp_file, "\n");
   if ARCH_IS_MAC_OS_X() then
     Exec("open ", temp_file);
-  fi;
-  if ARCH_IS_WINDOWS() then
+  elif ARCH_IS_WINDOWS() then
     Exec("start firefox ", temp_file);
-  fi;
-  if ARCH_IS_UNIX() then
+  elif ARCH_IS_UNIX() then
     Exec("xdg-open ", temp_file);
   fi;
 
@@ -291,9 +289,9 @@ InstallGlobalFunction(OverSemigroupsNumericalSemigroupInDot, function(s)
     # Add vertices
     for i in [1..n] do
         if IsIrreducible(ov[i]) then 
-            AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\", style=filled];\n");
+            AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\", style=filled];");
         else 
-            AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\"];\n");
+            AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\"];");
         fi;
     od;
 
@@ -301,11 +299,10 @@ InstallGlobalFunction(OverSemigroupsNumericalSemigroupInDot, function(s)
     c:=Cartesian([1..n],[1..n]);
     c:=Filtered(c, p-> p[2]<>p[1]);
     c:=Filtered(c, p-> IsSubset(ov[p[1]],ov[p[2]]));
-    Print(c,"\n");
     c:=hasse(c);
 
     for r in c do
-        AppendTo(output,r[1]," -> ",r[2],";\n");
+        AppendTo(output,r[1]," -> ",r[2],";");
     od;
 
     AppendTo(output, "}");
