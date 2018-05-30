@@ -81,3 +81,14 @@ DeclareGlobalFunction("DotTreeOfGluingsOfNumericalSemigroup");
 ##
 ############################################################################
 DeclareGlobalFunction("DotOverSemigroupsNumericalSemigroup");
+
+############################################################################
+##
+#O DotRosalesGraph(n,s)
+## s is either a numerical semigroup or an affine semigroup, and n is an
+## element of s
+## returns the graph associated to n in s in dot.
+##
+#############################################################################
+DeclareOperation("DotRosalesGraph",[IsHomogeneousList,IsAffineSemigroup]);
+DeclareOperation("DotRosalesGraph",[IsInt,IsNumericalSemigroup]);

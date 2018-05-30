@@ -326,3 +326,69 @@ InstallGlobalFunction(DotOverSemigroupsNumericalSemigroup, function(s)
   CloseStream(output);
   return out;  
 end);
+
+############################################################################
+##
+#O DotRosalesGraph(n,s)
+## s is either a numerical semigroup or an affine semigroup, and n is an
+## element of s
+## returns the graph associated to n in s in dot.
+##
+#############################################################################
+InstallMethod(DotRosalesGraph, "for numerical semigroups",  [IsInt,IsNumericalSemigroup], 
+function(n,s)
+  local msg, out, output, c, i, r, e;
+  msg:=Filtered(MinimalGenerators(s), g->n-g in s);
+  e:=Length(msg);
+  out := "";
+  output := OutputTextString(out, true);
+  SetPrintFormattingStatus(output, false);
+  AppendTo(output,"graph  NSGraph{rankdir = TB;");
+
+  # Add vertices
+  for i in [1..e] do
+    AppendTo(output,i," [label=\"",String(msg[i]) ,"\"];");
+  od;
+
+  # Add edges
+  c:=Cartesian([1..e],[1..e]);
+  c:=Filtered(c, p-> p[2]< p[1]);
+  c:=Filtered(c, p-> n-msg[p[1]]-msg[p[2]] in s);
+
+  for r in c do
+    AppendTo(output, r[1]," -- ",r[2],";");
+  od;
+
+  AppendTo(output, "}");
+  CloseStream(output);
+  return out;  
+end);
+
+InstallMethod(DotRosalesGraph, "for affine semigroups", [IsHomogeneousList,IsAffineSemigroup], 
+function(n,s)
+  local msg, out, output, c, i, r, e;
+  msg:=Filtered(MinimalGenerators(s), g->n-g in s);
+  e:=Length(msg);
+  out := "";
+  output := OutputTextString(out, true);
+  SetPrintFormattingStatus(output, false);
+  AppendTo(output,"graph  NSGraph{rankdir = TB;");
+
+  # Add vertices
+  for i in [1..e] do
+    AppendTo(output,i," [label=\"",String(msg[i]) ,"\"];");
+  od;
+
+  # Add edges
+  c:=Cartesian([1..e],[1..e]);
+  c:=Filtered(c, p-> p[2]< p[1]);
+  c:=Filtered(c, p-> n-msg[p[1]]-msg[p[2]] in s);
+
+  for r in c do
+    AppendTo(output, r[1]," -- ",r[2],";");
+  od;
+
+  AppendTo(output, "}");
+  CloseStream(output);
+  return out;  
+end);
