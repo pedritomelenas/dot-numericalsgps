@@ -74,13 +74,13 @@ end);
 
 ############################################################################
 ##
-#F BinaryRelationToDot(br)
+#F  DotBinaryRelation(br)
 ##  Returns a GraphViz dot which represents the binary relation br.
 ##  The set of vertices of the resulting graph is the source of br.
 ##  Edges join those elements which are related in br.
 ##
 ############################################################################
-InstallGlobalFunction(BinaryRelationToDot, function(br)
+InstallGlobalFunction(DotBinaryRelation, function(br)
   local pre, element, im, output, out, str;
 
   str := function(i)
@@ -264,13 +264,13 @@ end);
 
 ############################################################################
 ##
-#F OverSemigroupsNumericalSemigroupInDot(s)
+#F DotOverSemigroupsNumericalSemigroup(s)
 ##  Returns a GraphViz dot that represents the Hasse diagram of 
 ##  oversemigroupstree of the numerical semigroup s.
 ##  Irreducible numerical semigroups are highlighted.
 ##
 ############################################################################
-InstallGlobalFunction(OverSemigroupsNumericalSemigroupInDot, function(s)
+InstallGlobalFunction(DotOverSemigroupsNumericalSemigroup, function(s)
   local ov, c,i,r,n,hasse, str, output, out, SystemOfGeneratorsToString;
   
   hasse:=function(rel)
