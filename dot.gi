@@ -392,3 +392,85 @@ function(n,s)
   CloseStream(output);
   return out;  
 end);
+
+############################################################################
+##
+#O DotFactorizationGraph(f)
+##
+## f is a set of factorizations 
+## returns the graph of factorizations associated to f: a graph whose 
+## vertices are the elements of f, and there is an edge between two 
+## factorizations if they have common support. Edges are labelled with
+## distances between nodes they join. Kruskal algorithm is used to 
+## draw in red a spannin tree with minimal distances. Thus the catenary
+## degree is reached in the edges of the tree.
+##
+#############################################################################
+InstallMethod(DotFactorizationGraph, [IsRectangularTable],
+  function(f)
+  local fs, c, nf, i, p, ln, distance, Kruskal, tv, out, output, d;
+
+  Kruskal := function(V, E)
+      local trees, needed, v, e, i,j, nv;
+
+      trees := List(V, v-> [v]);
+      needed := [];
+      nv:=Length(V);
+      for e in E do
+        i:=First([1..Length(trees)], k-> e[1] in trees[k]);
+        j:=First([1..Length(trees)], k-> e[2] in trees[k]);
+        if i<>j then
+          trees[i]:=Union(trees[i], trees[j]);
+          trees[j]:=[];
+          Add(needed,e);
+        fi;
+        if Length(needed)=nv-1 then
+          break;
+        fi;
+      od;
+      return needed;
+  end;
+
+  distance := function(a,b)
+      local   k,  gcd,  i;
+
+      k := Length(a);
+      if k <> Length(b) then
+          Error("The lengths of a and b are different.\n");
+      fi;
+
+
+      gcd := [];
+      for i in [1..k] do
+          Add(gcd, Minimum(a[i],b[i]));
+      od;
+      return(Maximum(Sum(a-gcd),Sum(b-gcd)));
+
+  end;
+
+  out := "";
+  output := OutputTextString(out, true);
+  SetPrintFormattingStatus(output, false);
+  AppendTo(output,"graph  NSGraph{rankdir = TB;");
+
+  nf:=Length(f);
+  fs:=[];
+  for i in [1..nf] do 
+    AppendTo(output,i," [label=\" (", JoinStringsWithSeparator(f[i], ", ") ,")\"];");
+  od;
+  c:=Cartesian([1..nf],[1..nf]);
+  c:=Filtered(c,p->p[1]<p[2] and f[p[1]]*f[p[2]]<>0);
+  Sort(c,function(e,ee) return distance(f[e[1]],f[e[2]])<distance(f[ee[1]],f[ee[2]]); end);
+  tv:=Kruskal(f,List(c,p->[f[p[1]],f[p[2]]]));
+  for p in c do 
+    d:= distance(f[p[1]],f[p[2]]);
+    if [f[p[1]],f[p[2]]] in tv then 
+      AppendTo(output, p[1], " -- ", p[2], "[label=\"", d ,"\", color=\"red\"];" );
+    else
+      AppendTo(output, p[1], " -- ", p[2], "[label=\"", d,"\" ];" );
+    fi;    
+  od;
+  AppendTo(output, "}");
+  CloseStream(output);
+  return out;  
+end);
