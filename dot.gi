@@ -81,7 +81,7 @@ end);
 ##
 ############################################################################
 InstallGlobalFunction(DotBinaryRelation, function(br)
-  local pre, element, im, output, out, str;
+  local pre, element, im, output, out, str, i, d;
 
   str := function(i)
     return Concatenation("\"",String(i),"\"");
@@ -97,16 +97,22 @@ InstallGlobalFunction(DotBinaryRelation, function(br)
   AppendTo(output,"digraph  NSGraph{rankdir = TB; edge[dir=back];");
   
   # Add the vertices
-  pre := Source(br);
+  pre := Source(br);  
+  d := NewDictionary(false, true, pre);
+  i := 1;  
   for element in pre do
-    AppendTo(output, element," [label=", str(element), "];");
+    AddDictionary(d, element, i);      
+    AppendTo(output, i," [label=", str(element), "];");
+    i := i+1;    
   od;
   
   # Add the edges
+  i := 1;  
   for element in pre do
     for im in Image(br, [element]) do
-      AppendTo(output, im, " -> ", element, ";");
+      AppendTo(output, LookupDictionary(d, im), " -> ", i, ";");
     od;
+    i := i+1;    
   od;
   
   AppendTo(output, "}");
