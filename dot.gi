@@ -398,9 +398,8 @@ end);
 #O DotFactorizationGraph(f)
 ##
 ## f is a set of factorizations 
-## returns the graph of factorizations associated to f: a graph whose 
-## vertices are the elements of f, and there is an edge between two 
-## factorizations if they have common support. Edges are labelled with
+## returns the graph of factorizations associated to f: a complet graph 
+## whose vertices are the elements of f. Edges are labelled with
 ## distances between nodes they join. Kruskal algorithm is used to 
 ## draw in red a spannin tree with minimal distances. Thus the catenary
 ## degree is reached in the edges of the tree.
