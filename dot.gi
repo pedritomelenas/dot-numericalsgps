@@ -398,7 +398,7 @@ end);
 #O DotFactorizationGraph(f)
 ##
 ## f is a set of factorizations 
-## returns the graph of factorizations associated to f: a complet graph 
+## returns the graph of factorizations associated to f: a complete graph 
 ## whose vertices are the elements of f. Edges are labelled with
 ## distances between nodes they join. Kruskal algorithm is used to 
 ## draw in red a spannin tree with minimal distances. Thus the catenary
@@ -458,7 +458,7 @@ InstallMethod(DotFactorizationGraph, [IsRectangularTable],
     AppendTo(output,i," [label=\" (", JoinStringsWithSeparator(f[i], ", ") ,")\"];");
   od;
   c:=Cartesian([1..nf],[1..nf]);
-  c:=Filtered(c,p->p[1]<p[2] and f[p[1]]*f[p[2]]<>0);
+  c:=Filtered(c,p->p[1]<p[2]);
   Sort(c,function(e,ee) return distance(f[e[1]],f[e[2]])<distance(f[ee[1]],f[ee[2]]); end);
   tv:=Kruskal(f,List(c,p->[f[p[1]],f[p[2]]]));
   for p in c do 
@@ -468,6 +468,61 @@ InstallMethod(DotFactorizationGraph, [IsRectangularTable],
     else
       AppendTo(output, p[1], " -- ", p[2], "[label=\"", d,"\" ];" );
     fi;    
+  od;
+  AppendTo(output, "}");
+  CloseStream(output);
+  return out;  
+end);
+
+
+############################################################################
+##
+#O DotEliahouGraph(f)
+##
+## f is a set of factorizations 
+## returns the Eliahou graph of factorizations associated to f: a graph 
+## whose vertices are the elements of f, and there is an edge between
+## two vertices if they have common support. Edges are labelled with
+## distances between nodes they join.
+##
+#############################################################################
+InstallMethod(DotEliahouGraph, [IsRectangularTable],
+  function(f)
+  local fs, c, nf, i, p, ln, distance, tv, out, output, d;
+
+  distance := function(a,b)
+      local   k,  gcd,  i;
+
+      k := Length(a);
+      if k <> Length(b) then
+          Error("The lengths of a and b are different.\n");
+      fi;
+
+
+      gcd := [];
+      for i in [1..k] do
+          Add(gcd, Minimum(a[i],b[i]));
+      od;
+      return(Maximum(Sum(a-gcd),Sum(b-gcd)));
+
+  end;
+
+  out := "";
+  output := OutputTextString(out, true);
+  SetPrintFormattingStatus(output, false);
+  AppendTo(output,"graph  NSGraph{rankdir = TB;");
+
+  nf:=Length(f);
+  fs:=[];
+  for i in [1..nf] do 
+    AppendTo(output,i," [label=\" (", JoinStringsWithSeparator(f[i], ", ") ,")\"];");
+  od;
+  c:=Cartesian([1..nf],[1..nf]);
+  c:=Filtered(c,p->p[1]<p[2] and f[p[1]]*f[p[2]]<>0);
+  Sort(c,function(e,ee) return distance(f[e[1]],f[e[2]])<distance(f[ee[1]],f[ee[2]]); end);
+  for p in c do 
+    d:= distance(f[p[1]],f[p[2]]);
+    AppendTo(output, p[1], " -- ", p[2], "[label=\"", d,"\" ];" );
   od;
   AppendTo(output, "}");
   CloseStream(output);

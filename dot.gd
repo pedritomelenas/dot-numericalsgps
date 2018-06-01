@@ -106,3 +106,16 @@ DeclareOperation("DotRosalesGraph",[IsInt,IsNumericalSemigroup]);
 ##
 #############################################################################
 DeclareOperation("DotFactorizationGraph",[IsRectangularTable]);
+
+############################################################################
+##
+#O DotEliahouGraph(f)
+##
+## f is a set of factorizations 
+## returns the Eliahou graph of factorizations associated to f: a graph 
+## whose vertices are the elements of f, and there is an edge between
+## two vertices if they have common support. Edges are labelled with
+## distances between nodes they join.
+##
+#############################################################################
+DeclareOperation("DotEliahouGraph",[IsRectangularTable]);
