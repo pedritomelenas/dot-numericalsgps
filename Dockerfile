@@ -15,5 +15,6 @@ RUN apt-get update && apt-get install -yq curl && curl -sL https://deb.nodesourc
 
 USER $NB_UID
 
+RUN cd $HOME && bash scripts/prepare.sh && cd $GAPROOT/pkg && bash ../bin/BuildPackages.sh
 
 WORKDIR $HOME
