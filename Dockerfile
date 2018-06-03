@@ -19,4 +19,7 @@ RUN cd $HOME && bash scripts/prepare.sh && cd $GAPROOT/pkg && bash ../bin/BuildP
 
 RUN cd $GAPROOT/pkg/JupyterKernel && python setup.py install --user
 
+ENV JUPYTER_GAP_EXECUTABLE $GAPROOT/bin/gap.sh
+RUN ln -s $GAPROOT/pkg/JupyterKernel/bin/jupyter-kernel-gap /usr/local/bin/jupyter-kernel-gap
+
 WORKDIR $HOME
