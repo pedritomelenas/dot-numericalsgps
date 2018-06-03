@@ -17,4 +17,6 @@ USER $NB_UID
 
 RUN cd $HOME && bash scripts/prepare.sh && cd $GAPROOT/pkg && bash ../bin/BuildPackages.sh
 
+RUN cd $GAPROOT/pkg/JupyterKernel && python setup.py install --user
+
 WORKDIR $HOME
