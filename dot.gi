@@ -94,7 +94,7 @@ InstallGlobalFunction(DotBinaryRelation, function(br)
   # Add the header of the GraphViz code
   out := "";
   output := OutputTextString(out, true);
-  AppendTo(output,"digraph  NSGraph{rankdir = TB; edge[dir=back];");
+  AppendTo(output,"digraph  NSGraph{rankdir = TB; edge[dir=back];\n");
   
   # Add the vertices
   pre := Source(br);  
@@ -102,7 +102,7 @@ InstallGlobalFunction(DotBinaryRelation, function(br)
   i := 1;  
   for element in pre do
     AddDictionary(d, element, i);      
-    AppendTo(output, i," [label=", str(element), "];");
+    AppendTo(output, i," [label=", str(element), "];\n");
     i := i+1;    
   od;
   
@@ -110,7 +110,7 @@ InstallGlobalFunction(DotBinaryRelation, function(br)
   i := 1;  
   for element in pre do
     for im in Image(br, [element]) do
-      AppendTo(output, LookupDictionary(d, im), " -> ", i, ";");
+      AppendTo(output, LookupDictionary(d, im), " -> ", i, ";\n");
     od;
     i := i+1;    
   od;
@@ -213,8 +213,8 @@ InstallGlobalFunction(DotTreeOfGluingsOfNumericalSemigroup, function(s, depth...
       
     lg := AsGluingOfNumericalSemigroups(s);    
     
-    labels := Concatenation(labels, String(parent), " [label=\"", SystemOfGeneratorsToString(MinimalGenerators(s)), "\", style=filled]; ");
-    #labels := Concatenation(labels, String(parent), " [label=\"", SystemOfGeneratorsToString(MinimalGenerators(s)), "\"]; ");
+    labels := Concatenation(labels, String(parent), " [label=\"", SystemOfGeneratorsToString(MinimalGenerators(s)), "\", style=filled]; \n");
+    #labels := Concatenation(labels, String(parent), " [label=\"", SystemOfGeneratorsToString(MinimalGenerators(s)), "\"]; \n");
         
     if level = 0 then
       return ;
@@ -224,8 +224,8 @@ InstallGlobalFunction(DotTreeOfGluingsOfNumericalSemigroup, function(s, depth...
     for p in lg do
       # Add the gluing 
       label := Concatenation(SystemOfGeneratorsToString(p[1])," + ", SystemOfGeneratorsToString(p[2]));
-      labels := Concatenation(labels, String(index), " [label=\"", label, "\" , shape=box]; ");
-      edges := Concatenation(edges, String(parent), " -> ", String(index), "; ");
+      labels := Concatenation(labels, String(index), " [label=\"", label, "\" , shape=box]; \n");
+      edges := Concatenation(edges, String(parent), " -> ", String(index), "; \n");
       
       # Add the two numerical semigroups involved
       son1 := index+1;
@@ -234,8 +234,8 @@ InstallGlobalFunction(DotTreeOfGluingsOfNumericalSemigroup, function(s, depth...
       gen1 := p[1] / Gcd(p[1]);
       gen2 := p[2] / Gcd(p[2]);      
       
-      edges := Concatenation(edges, String(index), " -> ", String(son1), "; ");
-      edges := Concatenation(edges, String(index), " -> ", String(son2), "; ");
+      edges := Concatenation(edges, String(index), " -> ", String(son1), "; \n");
+      edges := Concatenation(edges, String(index), " -> ", String(son2), "; \n");
       
       # Call the function recursively
       index := index + 3;      
@@ -250,7 +250,7 @@ InstallGlobalFunction(DotTreeOfGluingsOfNumericalSemigroup, function(s, depth...
   labels := "";
   edges := "";  
   index := 1;
-  labels := Concatenation(labels, "0", " [label=\"", SystemOfGeneratorsToString(MinimalGenerators(s)), "\"]; ");  
+  labels := Concatenation(labels, "0", " [label=\"", SystemOfGeneratorsToString(MinimalGenerators(s)), "\"]; \n");  
   # Compute the tree
   rgluings(s, d, 0);
   
@@ -258,7 +258,7 @@ InstallGlobalFunction(DotTreeOfGluingsOfNumericalSemigroup, function(s, depth...
   out := "";
   output := OutputTextString(out, true);
   SetPrintFormattingStatus(output, false);
-  AppendTo(output,"digraph  NSGraph{rankdir = TB; ");
+  AppendTo(output,"digraph  NSGraph{rankdir = TB; \n");
   AppendTo(output, labels);
   AppendTo(output, edges);
   AppendTo(output, "}");
@@ -301,14 +301,14 @@ InstallGlobalFunction(DotOverSemigroupsNumericalSemigroup, function(s)
   out := "";
   output := OutputTextString(out, true);
   SetPrintFormattingStatus(output, false);
-  AppendTo(output,"digraph  NSGraph{rankdir = TB; edge[dir=back];");
+  AppendTo(output,"digraph  NSGraph{rankdir = TB; edge[dir=back];\n");
 
   # Add vertices
   for i in [1..n] do
    if IsIrreducible(ov[i]) then 
-    AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\", style=filled];");
+    AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\", style=filled];\n");
    else 
-    AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\"];");
+    AppendTo(output,i," [label=\"",SystemOfGeneratorsToString(MinimalGenerators(ov[i])) ,"\"];\n");
    fi;
   od;
 
@@ -319,7 +319,7 @@ InstallGlobalFunction(DotOverSemigroupsNumericalSemigroup, function(s)
   c:=hasse(c);
 
   for r in c do
-    AppendTo(output,r[1]," -> ",r[2],";");
+    AppendTo(output,r[1]," -> ",r[2],";\n");
   od;
 
   AppendTo(output, "}");
@@ -343,11 +343,11 @@ function(n,s)
   out := "";
   output := OutputTextString(out, true);
   SetPrintFormattingStatus(output, false);
-  AppendTo(output,"graph  NSGraph{rankdir = TB;");
+  AppendTo(output,"graph  NSGraph{\n");
 
   # Add vertices
   for i in [1..e] do
-    AppendTo(output,i," [label=\"",String(msg[i]) ,"\"];");
+    AppendTo(output,i," [label=\"",String(msg[i]) ,"\"];\n");
   od;
 
   # Add edges
@@ -356,7 +356,7 @@ function(n,s)
   c:=Filtered(c, p-> n-msg[p[1]]-msg[p[2]] in s);
 
   for r in c do
-    AppendTo(output, r[1]," -- ",r[2],";");
+    AppendTo(output, r[1]," -- ",r[2],";\n");
   od;
 
   AppendTo(output, "}");
@@ -372,11 +372,11 @@ function(n,s)
   out := "";
   output := OutputTextString(out, true);
   SetPrintFormattingStatus(output, false);
-  AppendTo(output,"graph  NSGraph{rankdir = TB;");
+  AppendTo(output,"graph  NSGraph{\n");
 
   # Add vertices
   for i in [1..e] do
-    AppendTo(output,i," [label=\"",String(msg[i]) ,"\"];");
+    AppendTo(output,i," [label=\"",String(msg[i]) ,"\"];\n");
   od;
 
   # Add edges
@@ -385,7 +385,7 @@ function(n,s)
   c:=Filtered(c, p-> n-msg[p[1]]-msg[p[2]] in s);
 
   for r in c do
-    AppendTo(output, r[1]," -- ",r[2],";");
+    AppendTo(output, r[1]," -- ",r[2],";\n");
   od;
 
   AppendTo(output, "}");
@@ -450,12 +450,12 @@ InstallMethod(DotFactorizationGraph, [IsRectangularTable],
   out := "";
   output := OutputTextString(out, true);
   SetPrintFormattingStatus(output, false);
-  AppendTo(output,"graph  NSGraph{rankdir = TB;");
+  AppendTo(output,"graph  NSGraph{\n");
 
   nf:=Length(f);
   fs:=[];
   for i in [1..nf] do 
-    AppendTo(output,i," [label=\" (", JoinStringsWithSeparator(f[i], ", ") ,")\"];");
+    AppendTo(output,i," [label=\" (", JoinStringsWithSeparator(f[i], ", ") ,")\"];\n");
   od;
   c:=Cartesian([1..nf],[1..nf]);
   c:=Filtered(c,p->p[1]<p[2]);
@@ -464,9 +464,9 @@ InstallMethod(DotFactorizationGraph, [IsRectangularTable],
   for p in c do 
     d:= distance(f[p[1]],f[p[2]]);
     if [f[p[1]],f[p[2]]] in tv then 
-      AppendTo(output, p[1], " -- ", p[2], "[label=\"", d ,"\", color=\"red\"];" );
+      AppendTo(output, p[1], " -- ", p[2], "[label=\"", d ,"\", color=\"red\"];\n" );
     else
-      AppendTo(output, p[1], " -- ", p[2], "[label=\"", d,"\" ];" );
+      AppendTo(output, p[1], " -- ", p[2], "[label=\"", d,"\" ];\n" );
     fi;    
   od;
   AppendTo(output, "}");
@@ -510,19 +510,19 @@ InstallMethod(DotEliahouGraph, [IsRectangularTable],
   out := "";
   output := OutputTextString(out, true);
   SetPrintFormattingStatus(output, false);
-  AppendTo(output,"graph  NSGraph{rankdir = TB;");
+  AppendTo(output,"graph  NSGraph{\n");
 
   nf:=Length(f);
   fs:=[];
   for i in [1..nf] do 
-    AppendTo(output,i," [label=\" (", JoinStringsWithSeparator(f[i], ", ") ,")\"];");
+    AppendTo(output,i," [label=\" (", JoinStringsWithSeparator(f[i], ", ") ,")\"];\n");
   od;
   c:=Cartesian([1..nf],[1..nf]);
   c:=Filtered(c,p->p[1]<p[2] and f[p[1]]*f[p[2]]<>0);
   Sort(c,function(e,ee) return distance(f[e[1]],f[e[2]])<distance(f[ee[1]],f[ee[2]]); end);
   for p in c do 
     d:= distance(f[p[1]],f[p[2]]);
-    AppendTo(output, p[1], " -- ", p[2], "[label=\"", d,"\" ];" );
+    AppendTo(output, p[1], " -- ", p[2], "[label=\"", d,"\" ];\n" );
   od;
   AppendTo(output, "}");
   CloseStream(output);
