@@ -48,7 +48,7 @@ InstallGlobalFunction(DotSplash, function(dots...)
   html := Concatenation(html, line);
   i := 1;
   for digraph in dots do
-    line := Concatenation(" document.getElementById(", str(i), ").innerHTML =Viz('", digraph, "');\n");
+    line := Concatenation(" document.getElementById(", str(i), ").innerHTML =Viz('", NormalizedWhitespace(digraph), "', {engine: \"", DotNSEngine, "\"});\n");
     html := Concatenation(html, line);
     i := i+1;
   od;
@@ -527,4 +527,26 @@ InstallMethod(DotEliahouGraph, [IsRectangularTable],
   AppendTo(output, "}");
   CloseStream(output);
   return out;  
+end);
+
+############################################################################
+##
+#F SetDotNSEngine(engine)
+##
+## This sets de value of DotNSEngine to engine, which must be any of 
+## the following "circo","dot","fdp","neato","osage","twopi".
+##
+############################################################################
+InstallGlobalFunction(SetDotNSEngine,
+function(s)
+  if not(IsString(s)) then
+    Error("The argument must be a string");
+  fi;
+  if not(s in ["circo","dot","fdp","neato","osage","twopi"]) then
+    Error("Engine not recognized");
+  fi;
+  MakeReadWriteGlobal("DotNSEngine");
+  DotNSEngine:=s;
+  MakeReadOnlyGlobal("DotNSEngine");
+  return true;
 end);

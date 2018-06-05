@@ -119,3 +119,22 @@ DeclareOperation("DotFactorizationGraph",[IsRectangularTable]);
 ##
 #############################################################################
 DeclareOperation("DotEliahouGraph",[IsRectangularTable]);
+
+############################################################################
+##
+#V DotNSEngine
+##
+## This variable stores the engine vizjs will use
+##
+############################################################################
+BindGlobal("DotNSEngine", "dot");
+
+############################################################################
+##
+#F SetDotNSEngine(engine)
+##
+## This sets de value of DotNSEngine to engine, which must be any of 
+## the following "circo","dot","fdp","neato","osage","twopi".
+##
+############################################################################
+DeclareGlobalFunction("SetDotNSEngine");
