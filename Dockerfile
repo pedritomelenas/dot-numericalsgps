@@ -1,3 +1,3 @@
-FROM gapsystem/gap-docker-master:latest
+FROM gapsystem/gap-docker-master:francy
 
 COPY . /home/gap
